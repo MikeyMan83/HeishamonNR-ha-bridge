@@ -4,7 +4,7 @@
   "type": "tab",
   "label": "HA Bridge",
   "disabled": false,
-  "info": "Publishes all HeishaMoNR settings + automation states to MQTT with Home Assistant auto-discovery. Edit the MQTT out node if the broker is not pre-filled."
+  "info": "HA Bridge v1.0.0 (see version.json / CHANGELOG.md). Publishes all HeishaMoNR settings + automation states to MQTT with Home Assistant auto-discovery. Edit the MQTT out node if the broker is not pre-filled."
  },
  {
   "id": "habridge.inject.fast",
