@@ -1,4 +1,8 @@
-## v1.1.2 (current)
+## v1.1.3 (current)
+
+Docs only, no runtime change: corrected the HA entity_id examples. HA actually generates ids as `sensor.heishamon_nr_flow_nr_<slug>` — device-name prefix `heishamon_nr_flow` ("HeishaMon NR Flow") plus the object id from the discovery name `NR <key>` — e.g. `sensor.heishamon_nr_flow_nr_rtc_automation_on_limit`. The wrong `sensor.heishamon_nr_<uid>` example in README and in the v1.0.0 note below was fixed accordingly.
+
+## v1.1.2
 
 Editor layout only, no runtime change: wider node spacing (`injects x=180, function x=440, mqtt out/debug x=740`, ys 100-240) so the tab does not hug the left edge of the canvas. Tip: delete any previously imported "HA Bridge" tab before re-importing, otherwise Node-RED may keep the old node positions.
 
@@ -27,4 +31,4 @@ Initial release of the HA bridge tab (`ha-bridge-flow.json`, 6 nodes, ids prefix
 Known limitations (documented, not bugs; chart keys and the fast-poll regex quirk were fixed in v1.1.0):
 
 - The mqtt out node references a broker config id from the authoring instance; on import elsewhere, select your own broker (see README Install step 2).
-- HA generates entity ids as `sensor.heishamon_nr_<uid>` (node_id `heishamon_nr` + object id from the discovery topic).
+- HA generates entity ids as `sensor.heishamon_nr_flow_nr_<slug>` (device-name prefix `heishamon_nr_flow` + object id from the discovery name `NR <key>`), e.g. `sensor.heishamon_nr_flow_nr_rtc_automation_on_limit` (corrected in v1.1.3).

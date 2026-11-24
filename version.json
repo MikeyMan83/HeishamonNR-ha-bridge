@@ -1,5 +1,5 @@
 {
-  "version": "1.1.2",
+  "version": "1.1.3",
   "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/main/ha-bridge-flow.json",
-  "notes": "Editor layout only: wider spacing (injects x=180, function x=440, outputs x=740) so the tab does not hug the left edge. No runtime change from v1.1.1."
+  "notes": "Docs only: corrected HA entity_id examples (actual prefix sensor.heishamon_nr_flow_...) in README/CHANGELOG. No runtime change from v1.1.2."
 }
