@@ -1,0 +1,5 @@
+{
+  "version": "5.0.1",
+  "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-update-tab/dashboard2/update-tab.json",
+  "notes": "Dashboard 2.0 (@flowfuse/node-red-dashboard, /dashboard). Ships one ui-theme (page references it); still no shipped ui-base — create exactly one ui-base (path /dashboard) in the editor and assign the page + ui-notification nodes to it. Legacy tab node kept but disabled (updater reads its version from flows JSON). Self-update pinned to the dashboard2 branch. Logic unchanged from v4.12.11 except the two toast messages. Verified live on Node-RED 5.0.10 + @flowfuse/node-red-dashboard 1.37.0."
+}
