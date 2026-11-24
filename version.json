@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/main/ha-bridge-flow.json",
-  "notes": "Fixes + coverage, still validated against HeishaMoNR flow 26.5.1 (stable): chart caches inside the settings objects are no longer flattened into per-point entities; fast-poll (60 s) regex now also matches limits, so rtc.automation_on/off_limit publish every 60 s; coverage extended with NightReduction*, Schedule_1..10 (+toggle items, conditions), DHW automation/setpoints, quiet/powerful/holiday, sterilization, solar and correction toggles (all names verified present in the 26.5.1 flow). Mock-runtime re-test: chart keys absent, limits on fast tick, new keys published, discovery still once per key per restart."
+  "notes": "Editor layout only: x/y coordinates added to all nodes so the tab renders as a clean left-to-right flow (injects -> function -> mqtt out/debug). No runtime change from v1.1.0."
 }

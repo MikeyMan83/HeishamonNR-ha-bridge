@@ -1,4 +1,8 @@
-## v1.1.0 (current)
+## v1.1.1 (current)
+
+Editor layout only, no runtime change: `x`/`y` coordinates added to all nodes in `ha-bridge-flow.json`, so the tab renders as a clean left-to-right flow in the editor (fast/slow injects on the left, publisher function in the middle, mqtt out + debug on the right) instead of all nodes stacked at the origin on import.
+
+## v1.1.0
 
 Fixes + coverage, re-validated against HeishaMoNR `flows (26.5.1 stable).json`:
 
