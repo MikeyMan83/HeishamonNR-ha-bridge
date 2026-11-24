@@ -2,7 +2,7 @@
 
 Importable Node-RED tab for [HeishaMoNR](https://github.com/edterbak/HeishaMoNR) that pushes **all flow settings and automation state** to MQTT with Home Assistant auto-discovery, so every internal value becomes a normal HA sensor with history. Since v1.2.0 the tab has its own dashboard page and keeps itself current from this repo, in line with [HeishamonNR-update-tab](https://github.com/MikeyMan83/HeishamonNR-update-tab).
 
-- Flow file: [`ha-bridge-flow.json`](ha-bridge-flow.json), **v2.0.1** (see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md)); all node ids prefixed `habridge`, so an import never collides with package ids. Nodes carry editor coordinates, so the tab lays out cleanly on import — delete any previously imported "HA Bridge" tab first (including its dashboard items), so the new positions apply and ids do not clash.
+- Flow file: [`ha-bridge-flow.json`](ha-bridge-flow.json), **v2.0.2** (see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md)); all node ids prefixed `habridge`, so an import never collides with package ids. Nodes carry editor coordinates, so the tab lays out cleanly on import — delete any previously imported "HA Bridge" tab first (including its dashboard items), so the new positions apply and ids do not clash.
 
 ## Why
 
@@ -16,7 +16,7 @@ HeishaMoNR exposes machine data to MQTT (`panasonic_heat_pump/...`), but keeps i
 
 ## Dashboard tab
 
-Dashboard 2.0: requires `@flowfuse/node-red-dashboard` (served at `/dashboard`; the legacy `node-red-dashboard` 3.6.6 at `/ui` keeps serving HeishaMoNR itself). Same layout style as the update tab: two half-width columns (two `ui-group`s of width 6 on the page’s 12-column grid), full-width buttons. The file does **not** ship a `ui-base`/`ui-theme` (v2.0.1 fix): two tab files would place two `ui-base` nodes on the same path `/dashboard`, and Dashboard 2.0 shares one socket server across bases — the second base’s pages then get no live widget wiring (dead buttons). Instead: make sure exactly one `ui-base` exists (path `/dashboard`; adding any ui-page from the palette auto-creates one), then assign this page — and the notification node’s `ui` field — to it in the editor’s Dashboard 2.0 sidebar, and deploy.
+Dashboard 2.0: requires `@flowfuse/node-red-dashboard` (served at `/dashboard`; the legacy `node-red-dashboard` 3.6.6 at `/ui` keeps serving HeishaMoNR itself). Same layout style as the update tab: two half-width columns (two `ui-group`s of width 6 on the page’s 12-column grid), full-width buttons. The file ships one `ui-theme` (the page references it) but **not** a `ui-base` (v2.0.1 fix): two tab files would place two `ui-base` nodes on the same path `/dashboard`, and Dashboard 2.0 shares one socket server across bases — the second base’s pages then get no live widget wiring (dead buttons). Instead: make sure exactly one `ui-base` exists (path `/dashboard`; adding any ui-page from the palette auto-creates one), then assign this page — and the notification node’s `ui` field — to it in the editor’s Dashboard 2.0 sidebar, and deploy. The legacy DB1 `tab` node is kept in the file but disabled, so `/ui` shows no empty tab. Verified by booting Node-RED 5.0.10 + `@flowfuse/node-red-dashboard` 1.37.0 with these files: one assigned `ui-base` gives `Node-RED Dashboard 2.0 started at /dashboard`, `/dashboard/ha-bridge` returns 200 and zero ui-registration errors.
 
 - **Status**: `Version` (boot-refreshed, also after a self-update), `Values` (number of published values, full snapshot) and `Last publish` (fast + full timestamps). Fed by the publisher's second output, refreshed every 60 s.
 - **Update**: [Check for updates] (cache-busted fetch of `version.json`; the result appears as `Bridge update available: vX.Y.Z. Press [Update from GitHub].` or `Up to date (vX.Y.Z).`), the persistent **Update status** field, and [Update from GitHub].
@@ -45,13 +45,13 @@ Check-then-apply in one button, following the update tab's trust model:
 
 ## Verify after install
 
-- The dashboard `Version` field shows `Running bridge version 2.0.1.` after the boot refresh.
+- The dashboard `Version` field shows `Running bridge version 2.0.2.` after the boot refresh.
 - `rtc.automation_on_limit` (entity `sensor.heishamon_nr_flow_nr_rtc_automation_on_limit`) should equal your RTC "revert" value. If you see 3.0/1.0, a flow update restored defaults: set them again.
 - `TOP97_Heater_Start_Delta` should read -3 on J-series units with factory element settings.
 
 ## Version
 
-Current: **2.0.1** — see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md). The tab node's info field also carries the version. Validated against HeishaMoNR flow **26.5.1 (stable)**; the bridge is expected to survive HeishaMoNR updates as long as the global storage objects keep their names.
+Current: **2.0.2** — see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md). The tab node's info field also carries the version. Validated against HeishaMoNR flow **26.5.1 (stable)**; the bridge is expected to survive HeishaMoNR updates as long as the global storage objects keep their names.
 
 ## Notes
 

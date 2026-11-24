@@ -1,4 +1,12 @@
-## v2.0.1 (current, 21 nodes)
+## v2.0.2 (current, 22 nodes)
+
+Dashboard 2.0 polish, verified by booting Node-RED 5.0.10 + `@flowfuse/node-red-dashboard` 1.37.0 locally with these files: with exactly one `ui-base` (path `/dashboard`) assigned, startup logs `Node-RED Dashboard 2.0 started at /dashboard`, `/dashboard/ha-bridge` serves HTTP 200 and there are zero ui-registration errors. (Without any `ui-base` every ui-* node errors and `/dashboard` 404s — by design; the base is created once in the editor.)
+
+- Ships one `ui-theme` (`habridge.dash.theme`) and the ui-page references it — `page.theme` must be a ui-theme node **id**, the string `"default"` only produced `Theme 'default' ... does not exist` warnings.
+- Legacy DB1 `tab` node (`habridge.tab.0001`) now `disabled: true`: with `node-red-dashboard` 3.6.6 also installed it would otherwise render an empty "HA Bridge" tab in the `/ui` menu. It stays in the file because the updater reads its version from the flows JSON.
+- Self-update pinned to the `dashboard2` branch (`RAW` const + `version.json` flowUrl), so the DB2 tab updates from the DB2 branch, not from main. Harness re-run green (56/56).
+
+## v2.0.1 (21 nodes)
 
 Fix for the v2.0.0 Dashboard 2.0 migration: the flow file shipped its own `ui-base`/`ui-theme`. Importing both Dashboard 2.0 tab files (this one + the update tab) put two `ui-base` nodes on the same path `/dashboard`; Dashboard 2.0 shares one socket server across all ui-base nodes, so the second base’s pages never receive widget events — buttons appeared dead. The flow no longer ships `ui-base`/`ui-theme`; assign the page + notification to your single `ui-base` in the editor’s Dashboard 2.0 sidebar (see README). Harness re-run green.
 

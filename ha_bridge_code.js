@@ -1,4 +1,4 @@
-// HA BRIDGE publisher for HeishaMoNR (v2.0.1) - separate tab, does not touch Ed's logic.
+// HA BRIDGE publisher for HeishaMoNR (v2.0.2) - separate tab, does not touch Ed's logic.
 // Reads the flow's own settings objects (global, file storage) and publishes
 // every value to MQTT, plus HA MQTT discovery configs once per key per restart.
 // Output 1: MQTT messages. Output 2: dashboard status (values count + timestamps).
@@ -114,7 +114,7 @@ for (const key of Object.keys(flat)) {
 
 context.set('seen', seen);
 
-// ---------- dashboard status (v2.0.1, output 2) ----------
+// ---------- dashboard status (v2.0.2, output 2) ----------
 const nState = msgs.filter(m => String(m.topic).indexOf('/config') === -1).length;
 const now = new Date();
 const pad = (x) => String(x).padStart(2, '0');

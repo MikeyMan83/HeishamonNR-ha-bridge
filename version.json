@@ -1,5 +1,5 @@
 {
-  "version": "2.0.1",
-  "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/main/ha-bridge-flow.json",
-  "notes": "Dashboard 2.0 (@flowfuse/node-red-dashboard, /dashboard): ui nodes are ui-page/ui-group/ui-text/ui-button/ui-notification. Fix vs v2.0.0: the flow no longer ships its own ui-base/ui-theme (two tab files would put two ui-base nodes on /dashboard, which breaks widget wiring) \u2014 assign the page + notification to your single ui-base in the editor sidebar. Requires @flowfuse/node-red-dashboard installed. Logic unchanged from v1.3.0."
+  "version": "2.0.2",
+  "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/dashboard2/ha-bridge-flow.json",
+  "notes": "Dashboard 2.0 (@flowfuse/node-red-dashboard, /dashboard). Ships one ui-theme (page references it); still no shipped ui-base — create exactly one ui-base (path /dashboard) in the editor and assign the page + ui-notification to it. Legacy tab node kept but disabled (updater reads its version from flows JSON). Self-update pinned to the dashboard2 branch. Logic unchanged from v1.3.0."
 }
