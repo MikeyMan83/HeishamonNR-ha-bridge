@@ -20,7 +20,7 @@ const OBJECTS = {
     sched_cond: 'Schedule_conditions'
 };
 
-// Scheduler rows: everything the flow stores per row (verified in 26.5.1)
+// Scheduler rows: per-row fields of the 26.5.1 flow (state/toggle_item/action/hour/minutes/day/override/condition; topic only row 1). setpoint/target do not exist in 26.5.1 and are skipped when undefined.
 const SCHED_SUFFIXES = ['state', 'toggle_item', 'action', 'setpoint', 'target',
                         'hour', 'minutes', 'day', 'override', 'topic', 'condition'];
 for (let i = 1; i <= 10; i++) {

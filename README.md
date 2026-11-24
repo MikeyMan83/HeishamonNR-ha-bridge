@@ -55,5 +55,5 @@ Current: **1.2.0** — see [`version.json»](version.json) and [`CHANGELOG.md»]
 ## Notes
 
 - Do not combine with earlier `wp-telemetry.json» versions (different topic prefix, would duplicate entities).
-- Flow tested via a mock runtime (28 checks): phased updater state machine incl. 401/token retry, v1 and v2 Admin API shapes, broker rescue, rev conflict, tampered URL and foreign-id refusal, publish stats.
+- Flow tested via a mock runtime (28 checks): phased updater state machine incl. 401/token retry, v1 and v2 Admin API shapes, broker rescue, rev conflict, tampered URL and foreign-id refusal, publish stats. Harness run ad-hoc; not committed to this repo (unlike HeishamonNR-update-tab’s `test/harness.js`).
 - HeishaMoNR itself is by [edterbak](https://github.com/edterbak/HeishaMoNR). This bridge: MIT license.
