@@ -2,7 +2,7 @@
 
 Importable Node-RED tab for [HeishaMoNR](https://github.com/edterbak/HeishaMoNR) that pushes **all flow settings and automation state** to MQTT with Home Assistant auto-discovery, so every internal value becomes a normal HA sensor with history. Since v1.2.0 the tab has its own dashboard page and keeps itself current from this repo, in line with [HeishamonNR-update-tab](https://github.com/MikeyMan83/HeishamonNR-update-tab).
 
-- Flow file: [`ha-bridge-flow.json`](ha-bridge-flow.json), **v1.3.0** (see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md)); all node ids prefixed `habridge`, so an import never collides with package ids. Nodes carry editor coordinates, so the tab lays out cleanly on import — delete any previously imported "HA Bridge" tab first (including its dashboard items), so the new positions apply and ids do not clash.
+- Flow file: [`ha-bridge-flow.json`](ha-bridge-flow.json), **v1.3.1** (see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md)); all node ids prefixed `habridge`, so an import never collides with package ids. Nodes carry editor coordinates, so the tab lays out cleanly on import — delete any previously imported "HA Bridge" tab first (including its dashboard items), so the new positions apply and ids do not clash.
 
 ## Why
 
@@ -27,6 +27,7 @@ Check-then-apply in one button, following the update tab's trust model:
 
 - Pinned URLs only (`raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge`), cache-buster on every fetch; a tampered `flowUrl` is refused.
 - Download validation: JSON array, every id `habridge.*`-prefixed, unique ids, tab node present, and the version inside the tab info must match `version.json` (wrong file = refused, nothing changes).
+- Dashboard-family guard: an update whose `ui-*` config node types belong to the other dashboard package (DB1 ↔ DB2) is refused before deploy — the Update button can never move the tab out of the current menu; such a file must be imported manually.
 - Running flows are read via the loopback Admin API (`http://127.0.0.1:1880`, or the `HAB_ADMIN_BASE` / `WPU_ADMIN_BASE` env var). If the editor is protected, the tab logs in once via `/auth/token` with the `HAB_ADMIN_USER` / `HAB_ADMIN_PASS` env vars (`WPU_ADMIN_*` also works); credentials never sit in the flow or context.
 - The merge replaces **only** `habridge.*` nodes; personal tabs, the WP update tab and everything else are untouched. If the pinned MQTT broker config id does not exist locally, the bridge nodes are rewritten to the locally most-used broker (broker rescue).
 - Deploys atomically via `POST /flows` with rev conflict detection (409 = a deploy raced you, press again).
@@ -44,13 +45,13 @@ Check-then-apply in one button, following the update tab's trust model:
 
 ## Verify after install
 
-- The dashboard `Version` field shows `Running bridge version 1.3.0.` after the boot refresh.
+- The dashboard `Version` field shows `Running bridge version 1.3.1.` after the boot refresh.
 - `rtc.automation_on_limit` (entity `sensor.heishamon_nr_flow_nr_rtc_automation_on_limit`) should equal your RTC "revert" value. If you see 3.0/1.0, a flow update restored defaults: set them again.
 - `TOP97_Heater_Start_Delta` should read -3 on J-series units with factory element settings.
 
 ## Version
 
-Current: **1.3.0** — see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md). The tab node's info field also carries the version. Validated against HeishaMoNR flow **26.5.1 (stable)**; the bridge is expected to survive HeishaMoNR updates as long as the global storage objects keep their names.
+Current: **1.3.1** — see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md). The tab node's info field also carries the version. Validated against HeishaMoNR flow **26.5.1 (stable)**; the bridge is expected to survive HeishaMoNR updates as long as the global storage objects keep their names.
 
 ## Notes
 

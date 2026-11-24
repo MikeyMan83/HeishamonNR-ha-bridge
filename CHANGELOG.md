@@ -1,4 +1,8 @@
-## v1.3.0 (current, 21 nodes)
+## v1.3.1 (current, 21 nodes)
+
+Self-update safety guard: before merging, the updater compares the dashboard family of the currently deployed `habridge.*` nodes (DB1 `ui_tab`/`ui_*` vs DB2 `ui-page`/`ui-*`) with the downloaded file. A framework-crossing update is refused with "dashboard framework change refused (db1 -> db2) ... Import the file manually instead. Nothing changed." — the Update button can no longer silently move the tab out of the current dashboard menu (the v2.0.x/Dashboard 2.0 incident). Same-family updates merge as before. Also fixed: the publisher func in the flow JSON was still stamped v1.2.1 while ha_bridge_code.js said v1.3.0 (byte-identity broken by the DB2 revert) - now both are v1.3.1 and the harness asserts byte-identity. Harness re-run green (59/59).
+
+## v1.3.0 (21 nodes)
 
 Wording and layout sweep: one concept = one name, full sentences on every surface, and the same sentence on toast and status field. Layout and vocabulary borrowed from the update tab, which received the same UI/UX golden-standard sweep in its v4.12.9/v4.12.10. No behaviour change beyond the texts.
 

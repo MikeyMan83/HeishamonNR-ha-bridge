@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.3.1",
   "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/main/ha-bridge-flow.json",
-  "notes": "Wording and layout sweep aligned with HeishamonNR-update-tab (v4.12.9/4.12.10): the Update status field speaks the same sentence templates (\"Bridge update available: X.Y.Z. Press [Update from GitHub].\" / \"Up to date (X.Y.Z).\"), the boot sentence is \"Running bridge version 1.3.0.\", the Update group and status fields use the update tab widget style, updater errors are full sentences with a named button, and the test harness is now committed. No publisher or updater logic change."
+  "notes": "Wording and layout sweep aligned with HeishamonNR-update-tab (v4.12.9/4.12.10): the Update status field speaks the same sentence templates (\"Bridge update available: X.Y.Z. Press [Update from GitHub].\" / \"Up to date (X.Y.Z).\"), the boot sentence is \"Running bridge version 1.3.1.\", the Update group and status fields use the update tab widget style, updater errors are full sentences with a named button, and the test harness is now committed. No publisher or updater logic change. v1.3.1 adds a dashboard-family guard to the self-updater: an update whose ui-* config node types belong to the other dashboard package (DB1 <-> DB2) is refused before deploy, so the Update button can never move the tab out of the current menu."
 }

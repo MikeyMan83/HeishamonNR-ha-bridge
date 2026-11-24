@@ -1,6 +1,6 @@
 // Test harness for the HA Bridge (committed like HeishamonNR-update-tab's test/harness.js).
 // Runs the REAL func code from ha-bridge-flow.json against mocked Node-RED globals.
-// Structure/style asserts pin the update-tab-aligned wording and layout (v1.3.0).
+// Structure/style asserts pin the update-tab-aligned wording and layout (v1.3.1).
 // Usage: node test/harness.js
 const fs = require('fs');
 const path = require('path');
@@ -46,19 +46,20 @@ function makeRunner() {
 }
 
 // ---------------- S1: structure, version sync, wording style (update-tab alignment) ----------------
-section('S1 v1.3.0: structure, version sync and update-tab-aligned wording');
+section('S1 v1.3.1: structure, version sync and update-tab-aligned wording');
 {
   ok(flow.length === 21, 'node count is 21', flow.length);
   ok(flow.every(n => String(n.id).indexOf('habridge.') === 0), 'every id is habridge-prefixed (merge safety)');
   ok(new Set(flow.map(n => n.id)).size === flow.length, 'ids unique');
+  ok(flow.find(n => n.id === 'habridge.func').func === require('fs').readFileSync(__dirname + '/../ha_bridge_code.js', 'utf8'), 'publisher func is byte-identical to ha_bridge_code.js');
   ok(!/[^\x00-\x7F]/.test(flowText), 'flow file is pure ASCII (no em dashes lurking as \\u escapes)');
   ok(flowText.endsWith('\n') && !flowText.endsWith('\n\n'), 'exactly one trailing newline');
   const tabNode = flow.find(n => n.type === 'tab');
   const infoM = String(tabNode.info).match(/v(\d+\.\d+\.\d+)/);
-  ok(infoM && infoM[1] === vjson.version && vjson.version === '1.3.0', 'tab info version === version.json === 1.3.0', { info: infoM && infoM[1], vj: vjson.version });
-  ok(String(byid['habridge.verfn'].func).includes("const VERSION = '1.3.0'") && String(byid['habridge.brain'].func).includes("const VERSION = '1.3.0'"), 'both VERSION consts are 1.3.0');
+  ok(infoM && infoM[1] === vjson.version && vjson.version === '1.3.1', 'tab info version === version.json === 1.3.1', { info: infoM && infoM[1], vj: vjson.version });
+  ok(String(byid['habridge.verfn'].func).includes("const VERSION = '1.3.1'") && String(byid['habridge.brain'].func).includes("const VERSION = '1.3.1'"), 'both VERSION consts are 1.3.1');
   const r = makeRunner();
-  ok(r.run('habridge.verfn', { payload: 'boot' }).payload === 'Running bridge version 1.3.0.', 'boot sentence template mirrors the update tab ("Running <thing> version <X>.")');
+  ok(r.run('habridge.verfn', { payload: 'boot' }).payload === 'Running bridge version 1.3.1.', 'boot sentence template mirrors the update tab ("Running <thing> version <X>.")');
   const groups = flow.filter(n => n.type === 'ui_group');
   const gnames = groups.map(g => g.name + ':' + g.order).sort().join('|');
   ok(groups.length === 2 && gnames === 'Status:1|Update:2', 'two half-width columns: Status and Update (order 1/2)', gnames);
@@ -134,8 +135,8 @@ section('S4 updater: sentence templates, validation, merge, broker rescue, deplo
   ok(v[0] === null && v[1] && v[1].payload === 'Bridge update available: 1.4.0. Press [Update from GitHub].' && v[1].topic === 'HA Bridge', 'update available: one sentence on toast AND field, toast titled HA Bridge', v[1] && v[1].payload);
   ok(v[2] && v[2].payload === v[1].payload && v[2].topic === undefined, 'check result identical on the Update status field (no diverging formats)');
   // up to date
-  const v2 = r.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '1.3.0', flowUrl: RAWFLOW } });
-  ok(v2[0] === null && v2[1] && v2[1].payload === 'Up to date (1.3.0).' && v2[2].payload === v2[1].payload, 'up to date: short confirmation, same on both surfaces', v2[1] && v2[1].payload);
+  const v2 = r.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '1.3.1', flowUrl: RAWFLOW } });
+  ok(v2[0] === null && v2[1] && v2[1].payload === 'Up to date (1.3.1).' && v2[2].payload === v2[1].payload, 'up to date: short confirmation, same on both surfaces', v2[1] && v2[1].payload);
   // error sentence
   const v3 = r.run('habridge.brain', { habPhase: 'ver', statusCode: 404, payload: 'Not Found' });
   ok(v3[0] === null && v3[1] && v3[1].payload === 'Update failed: version.json HTTP 404.' && v3[1].topic === 'HA Bridge error' && v3[2].payload === v3[1].payload, 'fail(): same full sentence on toast and field, error topic', v3[1] && v3[1].payload);
@@ -208,6 +209,33 @@ section('S4 updater: sentence templates, validation, merge, broker rescue, deplo
   const dep3 = dep2.run('habridge.brain', { habPhase: 'deploy', statusCode: 409, payload: {} });
   ok(dep3[1] && dep3[1].payload === 'Update failed: flows changed meanwhile (rev conflict). Press [Update from GitHub] again.' && dep3[2].payload === dep3[1].payload, 'rev conflict: one sentence with the button name on both surfaces', dep3[1] && dep3[1].payload);
 
+
+  // dashboard-family guard: framework-crossing update refused, nothing deployed
+  const r5 = makeRunner();
+  r5.run('habridge.brain', { payload: 'update' });
+  r5.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '1.4.0', flowUrl: RAWFLOW } });
+  r5.run('habridge.brain', { habPhase: 'flow', statusCode: 200, payload: JSON.stringify([
+    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v1.4.0 (test).' },
+    { id: 'habridge.dash.tab', type: 'ui-page', ui: '', path: '/ha-bridge' }
+  ]) });
+  const g = r5.run('habridge.brain', { habPhase: 'adminflows', statusCode: 200, payload: { flows: [
+    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v1.3.1.' },
+    { id: 'habridge.dash.g', type: 'ui_group', tab: 'habridge.tab.0001' },
+    { id: 'personal.1', type: 'inject' }
+  ], rev: 'r1' } });
+  ok(g[0] === null && g[1] && g[1].payload.indexOf('Update failed: dashboard framework change refused (db1 -> db2)') === 0, 'framework-crossing update refused with a clear sentence, no POST /flows', g[1] && g[1].payload);
+  const r6 = makeRunner();
+  r6.run('habridge.brain', { payload: 'update' });
+  r6.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '1.4.0', flowUrl: RAWFLOW } });
+  r6.run('habridge.brain', { habPhase: 'flow', statusCode: 200, payload: JSON.stringify([
+    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v1.4.0 (test).' },
+    { id: 'habridge.dash.g', type: 'ui_group', tab: 'habridge.tab.0001' }
+  ]) });
+  const g2 = r6.run('habridge.brain', { habPhase: 'adminflows', statusCode: 200, payload: { flows: [
+    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v1.3.1.' },
+    { id: 'habridge.dash.g.old', type: 'ui_group', tab: 'habridge.tab.0001' }
+  ], rev: 'r2' } });
+  ok(g2[0] && g2[0].method === 'POST', 'same-family update still merges and deploys');
   // download validation
   const r4 = makeRunner();
   r4.run('habridge.brain', { payload: 'update' });
