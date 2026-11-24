@@ -4,7 +4,7 @@
   "type": "tab",
   "label": "HA Bridge",
   "disabled": false,
-  "info": "HA Bridge v1.1.1 (see version.json / CHANGELOG.md). Publishes all HeishaMoNR settings + automation states to MQTT with Home Assistant auto-discovery. Edit the MQTT out node if the broker is not pre-filled."
+  "info": "HA Bridge v1.1.2 (see version.json / CHANGELOG.md). Publishes all HeishaMoNR settings + automation states to MQTT with Home Assistant auto-discovery. Edit the MQTT out node if the broker is not pre-filled."
  },
  {
   "id": "habridge.inject.fast",
@@ -24,7 +24,7 @@
   "topic": "fast",
   "payload": "",
   "payloadType": "date",
-  "x": 130,
+  "x": 180,
   "y": 100,
   "wires": [
    [
@@ -50,8 +50,8 @@
   "topic": "full",
   "payload": "",
   "payloadType": "date",
-  "x": 130,
-  "y": 200,
+  "x": 180,
+  "y": 220,
   "wires": [
    [
     "habridge.func"
@@ -65,8 +65,8 @@
   "name": "HA Bridge publisher",
   "func": "// HA BRIDGE for HeishaMoNR (c) placed in a separate tab, does not touch Ed's logic.\n// Reads the flow's own settings objects (global, file storage) and publishes\n// every value to MQTT. Also sends Home Assistant MQTT discovery configs once,\n// so entities appear automatically (device: \"HeishaMon NR Flow\").\n// Requires MQTT discovery enabled in HA (it is, if HeishaMon entities auto-appeared).\n\nconst STATE_BASE = 'heishamon/nr';      // state topics: heishamon/nr/<key>\nconst DISC_BASE  = 'homeassistant/sensor/heishamon_nr'; // discovery topics\n\n// Objects the flow persists (name = MQTT/HA prefix)\nconst OBJECTS = {\n    rtc:   'F_RTC',\n    ss:    'F_SS',\n    ccc:   'F_CCC',\n    solar: 'F_SOLAR',\n    cool:  'F_COOL',\n    pump:  'F_ReducePumpSpeed',\n    nr_room:    'NightReductionRoomSetpoint',\n    nr_water:   'NightReductionWaterTemp',\n    sched_cond: 'Schedule_conditions'\n};\nfor (let i = 1; i <= 10; i++) {\n    OBJECTS['sched_' + i + '_state']  = 'Schedule_' + i + '_state';\n    OBJECTS['sched_' + i + '_toggle'] = 'Schedule_' + i + '_toggle_item';\n}\n\n// \"fast\" poll (60 s): keys that look like live state / triggers / limits\nconst FAST = /state|power|setpoint|active|on_off|limit/i;\n\nconst fast = (msg.topic === 'fast');\n\n// ---------- flatten ----------\nfunction flatten(prefix, obj, out) {\n    if (obj === null || obj === undefined) return out;\n    if (typeof obj !== 'object') { out[prefix] = obj; return out; }\n    for (const k of Object.keys(obj)) { if (k === 'chart') continue; flatten(prefix + '.' + k, obj[k], out); }\n    return out;\n}\n\nconst flat = {};\n\n// Plain scalar globals (readback / runtime state, not in F_ objects)\nconst SCALARS = [\n    'TOP97_Heater_Start_Delta',      // J-series: factory −3 (readback = proof)\n    'TOP98_Heater_Stop_Delta',       // factory −1\n    'TOP96_Heater_Delay_Time',       // factory 30 min\n    'TOP94_Zones_State',\n    'TOP99_Buffer_Installed',\n    'T_zone_1', 'T_zone_2',\n    'VirtualState',\n    'Force_DHW_active',\n    'F_stored_next_operating_mode',\n    'DHW_automation_active', 'DHW_automation_delay', 'DHW_automation_state',\n    'DHW_boost_state', 'DHW_threshold_lower', 'DHW_threshold_upper',\n    'DHW_SP_HIGH', 'DHW_SP_LOW',\n    'Quiet_Mode_Level', 'Quietmode_time', 'Previous_Quiet_Mode_Level',\n    'PowerfulMode', 'HolidayMode',\n    'Sterilization_active', 'Sterilization_Temp', 'SetForceSterilization',\n    'SolarFunction_active',\n    'Correction_0_WAR_on_off', 'Correction_1_RTC_on_off', 'Correction_2_softstart_on_off'\n];\nfor (const s of SCALARS) {\n    const v = (global.get(s, 'file') !== undefined) ? global.get(s, 'file') : global.get(s);\n    if (v !== undefined && v !== null) flat['nr.' + s] = v;\n}\n\nfor (const [prefix, varName] of Object.entries(OBJECTS)) {\n    try {\n        const o = global.get(varName, 'file');\n        if (o !== undefined) flatten(prefix, o, flat);\n    } catch (e) { /* object not initialised yet */ }\n}\n\n// ---------- publish ----------\nconst seen = context.get('seen') || {};\nconst msgs = [];\nconst now = Date.now();\nlet newSeen = false;\n\nfor (const key of Object.keys(flat)) {\n    const v = flat[key];\n    if (v === null || v === undefined) continue;\n    if (fast && !FAST.test(key)) continue;   // fast tick only publishes state-like keys\n\n    const topic = STATE_BASE + '/' + key;\n    const payload = typeof v === 'object' ? JSON.stringify(v) : String(v);\n\n    // discovery config once per key per Node-RED restart\n    if (!seen[key]) {\n        seen[key] = true; newSeen = true;\n        const uid = key.toLowerCase().replace(/[^a-z0-9]+/g, '_');\n        msgs.push({\n            topic: DISC_BASE + '/' + uid + '/config',\n            payload: JSON.stringify({\n                name: 'NR ' + key,\n                unique_id: 'heishamon_nr_' + uid,\n                state_topic: topic,\n                retain: true,\n                device: {\n                    identifiers: ['heishamon_nr_flow'],\n                    name: 'HeishaMon NR Flow',\n                    manufacturer: 'HeishaMoNR bridge'\n                }\n            }),\n            retain: true, qos: 1\n        });\n    }\n    msgs.push({ topic: topic, payload: payload, retain: true, qos: 0 });\n}\n\ncontext.set('seen', seen);\nreturn [msgs];",
   "outputs": 1,
-  "x": 340,
-  "y": 150,
+  "x": 440,
+  "y": 160,
   "wires": [
    [
     "habridge.mqtt",
@@ -83,8 +83,8 @@
   "qos": "0",
   "retain": "true",
   "broker": "92e5b2c.00a8b5",
-  "x": 580,
-  "y": 110,
+  "x": 740,
+  "y": 120,
   "wires": []
  },
  {
@@ -93,8 +93,8 @@
   "z": "habridge.tab.0001",
   "name": "bridge msgs",
   "active": false,
-  "x": 580,
-  "y": 210,
+  "x": 740,
+  "y": 240,
   "wires": []
  }
 ]

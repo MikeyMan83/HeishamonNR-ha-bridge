@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.1.2",
   "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/main/ha-bridge-flow.json",
-  "notes": "Editor layout only: x/y coordinates added to all nodes so the tab renders as a clean left-to-right flow (injects -> function -> mqtt out/debug). No runtime change from v1.1.0."
+  "notes": "Editor layout only: wider spacing (injects x=180, function x=440, outputs x=740) so the tab does not hug the left edge. No runtime change from v1.1.1."
 }

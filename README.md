@@ -2,7 +2,7 @@
 
 Importable Node-RED tab for [HeishaMoNR](https://github.com/edterbak/HeishaMoNR) that pushes **all flow settings and automation state** to MQTT with Home Assistant auto-discovery, so every internal value becomes a normal HA sensor with history.
 
-- Flow file: [`ha-bridge-flow.json`](ha-bridge-flow.json), **v1.1.1** (see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md)); all node ids prefixed `habridge`, so an import never collides with package ids. Nodes carry editor coordinates, so the tab lays out cleanly on import.
+- Flow file: [`ha-bridge-flow.json`](ha-bridge-flow.json), **v1.1.2** (see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md)); all node ids prefixed `habridge`, so an import never collides with package ids. Nodes carry editor coordinates, so the tab lays out cleanly on import — delete any previously imported "HA Bridge" tab first, so the new positions are applied.
 - Validated against HeishaMoNR `flows (26.5.1 stable).json` (see [CHANGELOG.md](CHANGELOG.md) for what was verified).
 
 ## Why
@@ -29,7 +29,7 @@ HeishaMoNR exposes machine data to MQTT (`panasonic_heat_pump/...`), but keeps i
 
 ## Version
 
-Current: **1.1.1** — see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md). The tab node's info field also carries the version. Validated against HeishaMoNR flow **26.5.1 (stable)**; the bridge is expected to survive HeishaMoNR updates as long as the global storage objects keep their names.
+Current: **1.1.2** — see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md). The tab node's info field also carries the version. Validated against HeishaMoNR flow **26.5.1 (stable)**; the bridge is expected to survive HeishaMoNR updates as long as the global storage objects keep their names.
 
 ## Notes
 

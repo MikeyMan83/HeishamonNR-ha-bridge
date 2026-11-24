@@ -1,4 +1,8 @@
-## v1.1.1 (current)
+## v1.1.2 (current)
+
+Editor layout only, no runtime change: wider node spacing (`injects x=180, function x=440, mqtt out/debug x=740`, ys 100-240) so the tab does not hug the left edge of the canvas. Tip: delete any previously imported "HA Bridge" tab before re-importing, otherwise Node-RED may keep the old node positions.
+
+## v1.1.1
 
 Editor layout only, no runtime change: `x`/`y` coordinates added to all nodes in `ha-bridge-flow.json`, so the tab renders as a clean left-to-right flow in the editor (fast/slow injects on the left, publisher function in the middle, mqtt out + debug on the right) instead of all nodes stacked at the origin on import.
 
