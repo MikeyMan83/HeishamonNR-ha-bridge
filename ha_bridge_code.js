@@ -17,11 +17,18 @@ const OBJECTS = {
     ccc:   'F_CCC',
     solar: 'F_SOLAR',
     cool:  'F_COOL',
-    pump:  'F_ReducePumpSpeed'
+    pump:  'F_ReducePumpSpeed',
+    nr_room:    'NightReductionRoomSetpoint',
+    nr_water:   'NightReductionWaterTemp',
+    sched_cond: 'Schedule_conditions'
 };
+for (let i = 1; i <= 10; i++) {
+    OBJECTS['sched_' + i + '_state']  = 'Schedule_' + i + '_state';
+    OBJECTS['sched_' + i + '_toggle'] = 'Schedule_' + i + '_toggle_item';
+}
 
-// "fast" poll (60 s): keys that look like live state / triggers
-const FAST = /state|power|setpoint|active|on_off/i;
+// "fast" poll (60 s): keys that look like live state / triggers / limits
+const FAST = /state|power|setpoint|active|on_off|limit/i;
 
 const fast = (msg.topic === 'fast');
 
@@ -29,7 +36,7 @@ const fast = (msg.topic === 'fast');
 function flatten(prefix, obj, out) {
     if (obj === null || obj === undefined) return out;
     if (typeof obj !== 'object') { out[prefix] = obj; return out; }
-    for (const k of Object.keys(obj)) { flatten(prefix + '.' + k, obj[k], out); }
+    for (const k of Object.keys(obj)) { if (k === 'chart') continue; flatten(prefix + '.' + k, obj[k], out); }
     return out;
 }
 
@@ -45,7 +52,15 @@ const SCALARS = [
     'T_zone_1', 'T_zone_2',
     'VirtualState',
     'Force_DHW_active',
-    'F_stored_next_operating_mode'
+    'F_stored_next_operating_mode',
+    'DHW_automation_active', 'DHW_automation_delay', 'DHW_automation_state',
+    'DHW_boost_state', 'DHW_threshold_lower', 'DHW_threshold_upper',
+    'DHW_SP_HIGH', 'DHW_SP_LOW',
+    'Quiet_Mode_Level', 'Quietmode_time', 'Previous_Quiet_Mode_Level',
+    'PowerfulMode', 'HolidayMode',
+    'Sterilization_active', 'Sterilization_Temp', 'SetForceSterilization',
+    'SolarFunction_active',
+    'Correction_0_WAR_on_off', 'Correction_1_RTC_on_off', 'Correction_2_softstart_on_off'
 ];
 for (const s of SCALARS) {
     const v = (global.get(s, 'file') !== undefined) ? global.get(s, 'file') : global.get(s);

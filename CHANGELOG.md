@@ -1,4 +1,13 @@
-## v1.0.0 (current)
+## v1.1.0 (current)
+
+Fixes + coverage, re-validated against HeishaMoNR `flows (26.5.1 stable).json`:
+
+- `chart` subkeys inside the settings objects (`F_CCC.z1.chart`, `F_COOL.chart`, ...) are no longer flattened into per-data-point entities — HA records its own history of the live values, so the chart cache is redundant there.
+- Fast-poll (60 s) regex now also matches `limit` (`/state|power|setpoint|active|on_off|limit/i`): `rtc.automation_on_limit` / `automation_off_limit` and the RTC ladder limits publish every 60 s instead of only on the 10 min snapshot (previously `on_limit` was missed while `off_limit` accidentally matched via "on_off").
+- Coverage extended beyond the `F_*` objects (all names verified present in the 26.5.1 flow, file store): objects `NightReductionRoomSetpoint`, `NightReductionWaterTemp`, `Schedule_conditions`, `Schedule_1..10_state` + `Schedule_1..10_toggle_item`; scalars `DHW_automation_active/delay/state`, `DHW_boost_state`, `DHW_threshold_lower/upper`, `DHW_SP_HIGH/LOW`, `Quiet_Mode_Level`, `Quietmode_time`, `Previous_Quiet_Mode_Level`, `PowerfulMode`, `HolidayMode`, `Sterilization_active`, `Sterilization_Temp`, `SetForceSterilization`, `SolarFunction_active`, `Correction_0_WAR_on_off`, `Correction_1_RTC_on_off`, `Correction_2_softstart_on_off`.
+- Mock-runtime re-test: chart keys absent from output, limit keys present on the fast tick, all new keys published on the full tick, discovery configs still sent once per key per Node-RED restart.
+
+## v1.0.0
 
 Initial release of the HA bridge tab (`ha-bridge-flow.json`, 6 nodes, ids prefixed `habridge`).
 
@@ -7,9 +16,7 @@ Initial release of the HA bridge tab (`ha-bridge-flow.json`, 6 nodes, ids prefix
 - Read-only towards the flow: only `global.get`, no writes, separate tab, no link-in/link-out wiring.
 - Validated against HeishaMoNR `flows (26.5.1 stable).json`: every key the bridge reads exists with the expected storage store; RTC automation defaults 3.0/1.0, heater-delta readback ranges, and the `panasonic_heat_pump/...` upstream prefix (no collision with `heishamon/nr/...`) all confirmed in the flow source. Flow code in `ha-bridge-flow.json` is identical to `ha_bridge_code.js`; behaviour re-verified in a mock Node-RED runtime (fast tick emits only state-like keys, discovery once per key, retained payloads correct).
 
-Known limitations (documented, not bugs):
+Known limitations (documented, not bugs; chart keys and the fast-poll regex quirk were fixed in v1.1.0):
 
-- `chart` subkeys inside `F_CCC`/`F_COOL` are flattened per data point (`ccc.z1.chart.0.x`, ...), creating extra one-off entities; HA keeps its own history of the live values, so chart data is redundant in HA.
-- The 60 s fast-poll regex `/state|power|setpoint|active|on_off/i` matches `automation_off_limit` but not `automation_on_limit`, so `rtc.automation_on_limit` only publishes on the 10 min tick.
 - The mqtt out node references a broker config id from the authoring instance; on import elsewhere, select your own broker (see README Install step 2).
 - HA generates entity ids as `sensor.heishamon_nr_<uid>` (node_id `heishamon_nr` + object id from the discovery topic).
