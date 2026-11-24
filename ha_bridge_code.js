@@ -1,7 +1,7 @@
-// HA BRIDGE for HeishaMoNR (v1.1.4) placed in a separate tab, does not touch Ed's logic.
+// HA BRIDGE publisher for HeishaMoNR (v1.2.0) - separate tab, does not touch Ed's logic.
 // Reads the flow's own settings objects (global, file storage) and publishes
-// every value to MQTT. Also sends Home Assistant MQTT discovery configs once,
-// so entities appear automatically (device: \"HeishaMon NR Flow\").
+// every value to MQTT, plus HA MQTT discovery configs once per key per restart.
+// Output 1: MQTT messages. Output 2: dashboard status (values count + timestamps).
 // Requires MQTT discovery enabled in HA (it is, if HeishaMon entities auto-appeared).
 
 const STATE_BASE = 'heishamon/nr';      // state topics: heishamon/nr/<key>
@@ -113,4 +113,14 @@ for (const key of Object.keys(flat)) {
 }
 
 context.set('seen', seen);
-return [msgs];
+
+// ---------- dashboard status (v1.2.0, output 2) ----------
+const nState = msgs.filter(m => String(m.topic).indexOf('/config') === -1).length;
+const now = new Date();
+const pad = (x) => String(x).padStart(2, '0');
+const at = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+const stats = global.get('HAB_stats') || {};
+if (fast) { stats.fast = { n: nState, at: at }; } else { stats.full = { n: nState, at: at }; }
+global.set('HAB_stats', stats);
+
+return [msgs, { payload: stats }];

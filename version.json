@@ -1,5 +1,5 @@
 {
- "version": "1.1.4",
+ "version": "1.2.0",
  "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/main/ha-bridge-flow.json",
- "notes": "Scheduler rows fully covered (state/toggle_item/action/setpoint/target/hour/minutes/day/override/topic/condition per row 1-10); watched scalars publish 'unset' when the flow leaves them undefined (e.g. Quiet_Mode_Level), making gaps visible; added Quietmode_on_off. Logs are NOT included: the flow's Log tab is tab-private flow context, see README."
+ "notes": "Dashboard status tab (two half-width columns like the update tab: Version / Values / Last publish + [Check for updates] / [Update from GitHub]) and GitHub self-update: check-then-apply, loopback Admin API, habridge.*-only merge, broker rescue, rev-conflict reporting."
 }
