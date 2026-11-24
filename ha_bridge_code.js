@@ -1,10 +1,7 @@
-// Standalone copy of the function node code from ha-bridge-flow.json
-// (kept in the repo for easy reading / diffing; edit the flow via Node-RED import)
-
-// HA BRIDGE for HeishaMoNR (c) placed in a separate tab, does not touch Ed's logic.
+// HA BRIDGE for HeishaMoNR (v1.1.4) placed in a separate tab, does not touch Ed's logic.
 // Reads the flow's own settings objects (global, file storage) and publishes
 // every value to MQTT. Also sends Home Assistant MQTT discovery configs once,
-// so entities appear automatically (device: "HeishaMon NR Flow").
+// so entities appear automatically (device: \"HeishaMon NR Flow\").
 // Requires MQTT discovery enabled in HA (it is, if HeishaMon entities auto-appeared).
 
 const STATE_BASE = 'heishamon/nr';      // state topics: heishamon/nr/<key>
@@ -22,12 +19,17 @@ const OBJECTS = {
     nr_water:   'NightReductionWaterTemp',
     sched_cond: 'Schedule_conditions'
 };
+
+// Scheduler rows: everything the flow stores per row (verified in 26.5.1)
+const SCHED_SUFFIXES = ['state', 'toggle_item', 'action', 'setpoint', 'target',
+                        'hour', 'minutes', 'day', 'override', 'topic', 'condition'];
 for (let i = 1; i <= 10; i++) {
-    OBJECTS['sched_' + i + '_state']  = 'Schedule_' + i + '_state';
-    OBJECTS['sched_' + i + '_toggle'] = 'Schedule_' + i + '_toggle_item';
+    for (const suf of SCHED_SUFFIXES) {
+        OBJECTS['sched_' + i + '_' + suf] = 'Schedule_' + i + '_' + suf;
+    }
 }
 
-// "fast" poll (60 s): keys that look like live state / triggers / limits
+// \"fast\" poll (60 s): keys that look like live state / triggers / limits
 const FAST = /state|power|setpoint|active|on_off|limit/i;
 
 const fast = (msg.topic === 'fast');
@@ -42,10 +44,11 @@ function flatten(prefix, obj, out) {
 
 const flat = {};
 
-// Plain scalar globals (readback / runtime state, not in F_ objects)
+// Plain scalar globals (readback / runtime state, not in F_ objects).
+// Missing ones are published as 'unset' so gaps (e.g. Quiet_Mode_Level) are visible.
 const SCALARS = [
-    'TOP97_Heater_Start_Delta',      // J-series: factory −3 (readback = proof)
-    'TOP98_Heater_Stop_Delta',       // factory −1
+    'TOP97_Heater_Start_Delta',      // J-series: factory -3 (readback = proof)
+    'TOP98_Heater_Stop_Delta',       // factory -1
     'TOP96_Heater_Delay_Time',       // factory 30 min
     'TOP94_Zones_State',
     'TOP99_Buffer_Installed',
@@ -56,7 +59,7 @@ const SCALARS = [
     'DHW_automation_active', 'DHW_automation_delay', 'DHW_automation_state',
     'DHW_boost_state', 'DHW_threshold_lower', 'DHW_threshold_upper',
     'DHW_SP_HIGH', 'DHW_SP_LOW',
-    'Quiet_Mode_Level', 'Quietmode_time', 'Previous_Quiet_Mode_Level',
+    'Quiet_Mode_Level', 'Quietmode_time', 'Quietmode_on_off', 'Previous_Quiet_Mode_Level',
     'PowerfulMode', 'HolidayMode',
     'Sterilization_active', 'Sterilization_Temp', 'SetForceSterilization',
     'SolarFunction_active',
@@ -64,7 +67,7 @@ const SCALARS = [
 ];
 for (const s of SCALARS) {
     const v = (global.get(s, 'file') !== undefined) ? global.get(s, 'file') : global.get(s);
-    if (v !== undefined && v !== null) flat['nr.' + s] = v;
+    flat['nr.' + s] = (v === undefined || v === null) ? 'unset' : v;
 }
 
 for (const [prefix, varName] of Object.entries(OBJECTS)) {
@@ -77,8 +80,6 @@ for (const [prefix, varName] of Object.entries(OBJECTS)) {
 // ---------- publish ----------
 const seen = context.get('seen') || {};
 const msgs = [];
-const now = Date.now();
-let newSeen = false;
 
 for (const key of Object.keys(flat)) {
     const v = flat[key];
@@ -90,7 +91,7 @@ for (const key of Object.keys(flat)) {
 
     // discovery config once per key per Node-RED restart
     if (!seen[key]) {
-        seen[key] = true; newSeen = true;
+        seen[key] = true;
         const uid = key.toLowerCase().replace(/[^a-z0-9]+/g, '_');
         msgs.push({
             topic: DISC_BASE + '/' + uid + '/config',
