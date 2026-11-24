@@ -1,10 +1,12 @@
-## repo hygiene (no tab version bump)
+## v1.2.1 (current, 21 nodes)
+
+Repo hygiene only, no runtime change — one consistent current version across flow, version.json, README and CHANGELOG:
 
 - CHANGELOG entries now carry node counts like HeishamonNR-update-tab (`## vX.Y.Z (current, N nodes)`); `ha-bridge-flow.json` and `version.json` reformatted to 2-space indent with trailing newline, matching the update-tab repo.
 - Corrected the v1.1.4 entry and the publisher comment: HeishaMoNR 26.5.1 stores no `Schedule_N_setpoint`/`Schedule_N_target` (skipped when undefined), and `topic` only on row 1.
 - The v1.2.0 mock harness (28/28) was run ad-hoc and is NOT committed, unlike update-tab’s `test/harness.js`.
 
-## v1.2.0 (current, 21 nodes)
+## v1.2.0 (21 nodes)
 
 Dashboard status tab + GitHub self-update, in line with [HeishamonNR-update-tab](https://github.com/MikeyMan83/HeishamonNR-update-tab).
 
