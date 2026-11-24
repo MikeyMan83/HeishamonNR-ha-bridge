@@ -1,4 +1,14 @@
-## v1.3.0 (current, 21 nodes)
+## v2.0.0 (current, 23 nodes)
+
+Dashboard 2.0 migration — the dashboard items now target **@flowfuse/node-red-dashboard** (Dashboard 2.0, `/dashboard`), not the legacy `node-red-dashboard` 3.6.6 at `/ui` (which keeps serving HeishaMoNR itself). Install `@flowfuse/node-red-dashboard` via Manage palette before importing.
+
+- `ui_tab` -> `ui-page` (`/ha-bridge`, grid layout; 12-column desktop breakpoint keeps the two width-6 groups side by side), `ui_group` -> `ui-group`, `ui_text` -> `ui-text` (`col-left` -> `col-center`; Dashboard 2.0 has no `col-left`), `ui_button` -> `ui-button`, `ui_toast` -> `ui-notification` (position `top right`, bound to the ui-base).
+- The file ships its own `ui-base` (path `/dashboard`) + `ui-theme`; when importing several Dashboard 2.0 files, keep only one `ui-base` and re-point the other pages in the editor sidebar.
+- All logic nodes unchanged; the self-updater merge (habridge.*-only) also covers the new ui-base/ui-theme ids.
+- Also repaired a v1.3.0 regression: the publisher `func` inside the flow and `ha_bridge_code.js` had diverged (func header still said v1.2.1) — byte-identity restored and asserted again.
+- Harness updated for the DB2 node types (col-center layout, ui-group/ui-button) and re-run green.
+
+## v1.3.0 (21 nodes)
 
 Wording and layout sweep: one concept = one name, full sentences on every surface, and the same sentence on toast and status field. Layout and vocabulary borrowed from the update tab, which received the same UI/UX golden-standard sweep in its v4.12.9/v4.12.10. No behaviour change beyond the texts.
 
