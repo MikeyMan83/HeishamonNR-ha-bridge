@@ -1,4 +1,15 @@
-## v1.2.1 (current, 21 nodes)
+## v1.3.0 (current, 21 nodes)
+
+Wording and layout sweep: one concept = one name, full sentences on every surface, and the same sentence on toast and status field. Layout and vocabulary borrowed from the update tab, which received the same UI/UX golden-standard sweep in its v4.12.9/v4.12.10. No behaviour change beyond the texts.
+
+- **Update status** is now the single name of the persistent check-result field (was "GitHub / update status"); its group is called **Update**. [Check for updates] writes one full sentence, identical on toast and field: `Bridge update available: X.Y.Z. Press [Update from GitHub].` or `Up to date (X.Y.Z).` (replaces the `GitHub: vX (update!)` / `(up to date)` shorthand).
+- Every failure path uses the same `Update failed: <reason>.` template on both surfaces (toast topic `HA Bridge error`); the 409 rev conflict names the button to press again.
+- Version field boot sentence: `Running bridge version 1.3.0.` (was `Running: v1.2.1`), matching the update tab's sentence style.
+- Deploy success: toast `Bridge update succeeded: now running X. Fields refresh after the restart.` and field `Last update: X (ok).`; the locale-dependent timestamp was dropped so the texts are deterministic and testable.
+- Layout: all four status fields share the update tab widget style (width 6, height 2, left-aligned); both buttons carry tooltips; editor node names follow one casing convention.
+- The mock-runtime test harness is now committed as `test/harness.js` (like the update-tab repo) and runs the real flow funcs: 56/56 green.
+
+## v1.2.1 (21 nodes)
 
 Repo hygiene only, no runtime change — one consistent current version across flow, version.json, README and CHANGELOG:
 

@@ -2,7 +2,7 @@
 
 Importable Node-RED tab for [HeishaMoNR](https://github.com/edterbak/HeishaMoNR) that pushes **all flow settings and automation state** to MQTT with Home Assistant auto-discovery, so every internal value becomes a normal HA sensor with history. Since v1.2.0 the tab has its own dashboard page and keeps itself current from this repo, in line with [HeishamonNR-update-tab](https://github.com/MikeyMan83/HeishamonNR-update-tab).
 
-- Flow file: [`ha-bridge-flow.json`](ha-bridge-flow.json), **v1.2.1** (see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md)); all node ids prefixed `habridge`, so an import never collides with package ids. Nodes carry editor coordinates, so the tab lays out cleanly on import — delete any previously imported "HA Bridge" tab first (including its dashboard items), so the new positions apply and ids do not clash.
+- Flow file: [`ha-bridge-flow.json`](ha-bridge-flow.json), **v1.3.0** (see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md)); all node ids prefixed `habridge`, so an import never collides with package ids. Nodes carry editor coordinates, so the tab lays out cleanly on import — delete any previously imported "HA Bridge" tab first (including its dashboard items), so the new positions apply and ids do not clash.
 
 ## Why
 
@@ -19,7 +19,7 @@ HeishaMoNR exposes machine data to MQTT (`panasonic_heat_pump/...`), but keeps i
 In the same layout style as the update tab: two half-width columns (two `ui_group`s of width 6), full-width buttons.
 
 - **Status**: `Version` (boot-refreshed, also after a self-update), `Values` (number of published values, full snapshot) and `Last publish` (fast + full timestamps). Fed by the publisher's second output, refreshed every 60 s.
-- **Update from GitHub**: [Check for updates] (cache-busted fetch of `version.json`, shows `GitHub: vX (update!)` or `(up to date)`), the persistent GitHub / update status field, and [Update from GitHub].
+- **Update**: [Check for updates] (cache-busted fetch of `version.json`; the result appears as `Bridge update available: vX.Y.Z. Press [Update from GitHub].` or `Up to date (vX.Y.Z).`), the persistent **Update status** field, and [Update from GitHub].
 
 ## Self-update ([Update from GitHub])
 
@@ -44,16 +44,16 @@ Check-then-apply in one button, following the update tab's trust model:
 
 ## Verify after install
 
-- The dashboard `Version` field shows `Running: v1.2.1` after the boot refresh.
+- The dashboard `Version` field shows `Running bridge version 1.3.0.` after the boot refresh.
 - `rtc.automation_on_limit` (entity `sensor.heishamon_nr_flow_nr_rtc_automation_on_limit`) should equal your RTC "revert" value. If you see 3.0/1.0, a flow update restored defaults: set them again.
 - `TOP97_Heater_Start_Delta` should read -3 on J-series units with factory element settings.
 
 ## Version
 
-Current: **1.2.1** — see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md). The tab node's info field also carries the version. Validated against HeishaMoNR flow **26.5.1 (stable)**; the bridge is expected to survive HeishaMoNR updates as long as the global storage objects keep their names.
+Current: **1.3.0** — see [`version.json`](version.json) and [`CHANGELOG.md`](CHANGELOG.md). The tab node's info field also carries the version. Validated against HeishaMoNR flow **26.5.1 (stable)**; the bridge is expected to survive HeishaMoNR updates as long as the global storage objects keep their names.
 
 ## Notes
 
 - Do not combine with earlier `wp-telemetry.json` versions (different topic prefix, would duplicate entities).
-- Flow tested via a mock runtime (28 checks): phased updater state machine incl. 401/token retry, v1 and v2 Admin API shapes, broker rescue, rev conflict, tampered URL and foreign-id refusal, publish stats. Harness run ad-hoc; not committed to this repo (unlike HeishamonNR-update-tab's `test/harness.js`).
+- Flow tested via `test/harness.js` (56 checks, committed like update-tab's harness): it runs the real flow funcs against a mocked runtime, covering the phased updater state machine incl. 401/token retry, v1 and v2 Admin API shapes, broker rescue, rev conflict, tampered URL and foreign-id refusal, discovery-once, fast/full tick filtering, publish stats, and the exact user-visible sentence templates.
 - HeishaMoNR itself is by [edterbak](https://github.com/edterbak/HeishaMoNR). This bridge: MIT license.
