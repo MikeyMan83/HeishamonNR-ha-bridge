@@ -1,5 +1,5 @@
 {
-  "version": "1.1.3",
-  "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/main/ha-bridge-flow.json",
-  "notes": "Docs only: corrected HA entity_id examples (actual prefix sensor.heishamon_nr_flow_...) in README/CHANGELOG. No runtime change from v1.1.2."
+ "version": "1.1.4",
+ "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/main/ha-bridge-flow.json",
+ "notes": "Scheduler rows fully covered (state/toggle_item/action/setpoint/target/hour/minutes/day/override/topic/condition per row 1-10); watched scalars publish 'unset' when the flow leaves them undefined (e.g. Quiet_Mode_Level), making gaps visible; added Quietmode_on_off. Logs are NOT included: the flow's Log tab is tab-private flow context, see README."
 }
