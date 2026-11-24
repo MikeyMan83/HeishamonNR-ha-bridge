@@ -1,4 +1,8 @@
-## v2.0.0 (current, 23 nodes)
+## v2.0.1 (current, 21 nodes)
+
+Fix for the v2.0.0 Dashboard 2.0 migration: the flow file shipped its own `ui-base`/`ui-theme`. Importing both Dashboard 2.0 tab files (this one + the update tab) put two `ui-base` nodes on the same path `/dashboard`; Dashboard 2.0 shares one socket server across all ui-base nodes, so the second base’s pages never receive widget events — buttons appeared dead. The flow no longer ships `ui-base`/`ui-theme`; assign the page + notification to your single `ui-base` in the editor’s Dashboard 2.0 sidebar (see README). Harness re-run green.
+
+## v2.0.0 (23 nodes, shipped ui-base — superseded by v2.0.1)
 
 Dashboard 2.0 migration — the dashboard items now target **@flowfuse/node-red-dashboard** (Dashboard 2.0, `/dashboard`), not the legacy `node-red-dashboard` 3.6.6 at `/ui` (which keeps serving HeishaMoNR itself). Install `@flowfuse/node-red-dashboard` via Manage palette before importing.
 

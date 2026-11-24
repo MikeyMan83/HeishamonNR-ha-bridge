@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "flowUrl": "https://raw.githubusercontent.com/MikeyMan83/HeishamonNR-ha-bridge/main/ha-bridge-flow.json",
-  "notes": "Dashboard 2.0 (@flowfuse/node-red-dashboard, served at /dashboard): ui nodes converted to ui-page/ui-group/ui-text/ui-button/ui-notification; the file ships its own ui-base (path /dashboard) + ui-theme. Requires @flowfuse/node-red-dashboard installed (legacy node-red-dashboard 3.6.6 at /ui keeps serving HeishaMoNR itself). Logic unchanged from v1.3.0."
+  "notes": "Dashboard 2.0 (@flowfuse/node-red-dashboard, /dashboard): ui nodes are ui-page/ui-group/ui-text/ui-button/ui-notification. Fix vs v2.0.0: the flow no longer ships its own ui-base/ui-theme (two tab files would put two ui-base nodes on /dashboard, which breaks widget wiring) \u2014 assign the page + notification to your single ui-base in the editor sidebar. Requires @flowfuse/node-red-dashboard installed. Logic unchanged from v1.3.0."
 }

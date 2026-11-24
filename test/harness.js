@@ -1,6 +1,6 @@
 // Test harness for the HA Bridge (committed like HeishamonNR-update-tab's test/harness.js).
 // Runs the REAL func code from ha-bridge-flow.json against mocked Node-RED globals.
-// Structure/style asserts pin the update-tab-aligned wording and layout (v2.0.0).
+// Structure/style asserts pin the update-tab-aligned wording and layout (v2.0.1).
 // Usage: node test/harness.js
 const fs = require('fs');
 const path = require('path');
@@ -46,19 +46,19 @@ function makeRunner() {
 }
 
 // ---------------- S1: structure, version sync, wording style (update-tab alignment) ----------------
-section('S1 v2.0.0: structure, version sync and update-tab-aligned wording');
+section('S1 v2.0.1: structure, version sync and update-tab-aligned wording');
 {
-  ok(flow.length === 23, 'node count is 23 (21 flow nodes + ui-base + ui-theme)', flow.length);
+  ok(flow.length === 21, 'node count is 21 (v2.0.1: no shipped ui-base/ui-theme, assign in the editor sidebar)', flow.length);
   ok(flow.every(n => String(n.id).indexOf('habridge.') === 0), 'every id is habridge-prefixed (merge safety)');
   ok(new Set(flow.map(n => n.id)).size === flow.length, 'ids unique');
   ok(!/[^\x00-\x7F]/.test(flowText), 'flow file is pure ASCII (no em dashes lurking as \\u escapes)');
   ok(flowText.endsWith('\n') && !flowText.endsWith('\n\n'), 'exactly one trailing newline');
   const tabNode = flow.find(n => n.type === 'tab');
   const infoM = String(tabNode.info).match(/v(\d+\.\d+\.\d+)/);
-  ok(infoM && infoM[1] === vjson.version && vjson.version === '2.0.0', 'tab info version === version.json === 2.0.0', { info: infoM && infoM[1], vj: vjson.version });
-  ok(String(byid['habridge.verfn'].func).includes("const VERSION = '2.0.0'") && String(byid['habridge.brain'].func).includes("const VERSION = '2.0.0'"), 'both VERSION consts are 2.0.0');
+  ok(infoM && infoM[1] === vjson.version && vjson.version === '2.0.1', 'tab info version === version.json === 2.0.1', { info: infoM && infoM[1], vj: vjson.version });
+  ok(String(byid['habridge.verfn'].func).includes("const VERSION = '2.0.1'") && String(byid['habridge.brain'].func).includes("const VERSION = '2.0.1'"), 'both VERSION consts are 2.0.1');
   const r = makeRunner();
-  ok(r.run('habridge.verfn', { payload: 'boot' }).payload === 'Running bridge version 2.0.0.', 'boot sentence template mirrors the update tab ("Running <thing> version <X>.")');
+  ok(r.run('habridge.verfn', { payload: 'boot' }).payload === 'Running bridge version 2.0.1.', 'boot sentence template mirrors the update tab ("Running <thing> version <X>.")');
   const groups = flow.filter(n => n.type === 'ui-group');
   const gnames = groups.map(g => g.name + ':' + g.order).sort().join('|');
   ok(groups.length === 2 && gnames === 'Status:1|Update:2', 'two half-width columns: Status and Update (order 1/2)', gnames);
@@ -130,17 +130,17 @@ section('S4 updater: sentence templates, validation, merge, broker rescue, deplo
   ok(c && c[0] && c[0].url === RAWVJ + '?t=' + c[0].url.split('?t=')[1] && c[0].url.indexOf(RAWVJ) === 0 && c[0].method === 'GET', '[Check for updates] fetches the pinned version.json (cache-busted)', c && c[0] && c[0].url);
   ok(c[1] === null && c[2] === null, 'check phase itself displays nothing yet');
   // newer version found
-  const v = r.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.1.0', flowUrl: RAWFLOW } });
-  ok(v[0] === null && v[1] && v[1].payload === 'Bridge update available: 2.1.0. Press [Update from GitHub].' && v[1].topic === 'HA Bridge', 'update available: one sentence on toast AND field, toast titled HA Bridge', v[1] && v[1].payload);
+  const v = r.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.2.0', flowUrl: RAWFLOW } });
+  ok(v[0] === null && v[1] && v[1].payload === 'Bridge update available: 2.2.0. Press [Update from GitHub].' && v[1].topic === 'HA Bridge', 'update available: one sentence on toast AND field, toast titled HA Bridge', v[1] && v[1].payload);
   ok(v[2] && v[2].payload === v[1].payload && v[2].topic === undefined, 'check result identical on the Update status field (no diverging formats)');
   // up to date
-  const v2 = r.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.0.0', flowUrl: RAWFLOW } });
-  ok(v2[0] === null && v2[1] && v2[1].payload === 'Up to date (2.0.0).' && v2[2].payload === v2[1].payload, 'up to date: short confirmation, same on both surfaces', v2[1] && v2[1].payload);
+  const v2 = r.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.0.1', flowUrl: RAWFLOW } });
+  ok(v2[0] === null && v2[1] && v2[1].payload === 'Up to date (2.0.1).' && v2[2].payload === v2[1].payload, 'up to date: short confirmation, same on both surfaces', v2[1] && v2[1].payload);
   // error sentence
   const v3 = r.run('habridge.brain', { habPhase: 'ver', statusCode: 404, payload: 'Not Found' });
   ok(v3[0] === null && v3[1] && v3[1].payload === 'Update failed: version.json HTTP 404.' && v3[1].topic === 'HA Bridge error' && v3[2].payload === v3[1].payload, 'fail(): same full sentence on toast and field, error topic', v3[1] && v3[1].payload);
   // tampered flowUrl
-  const v4 = r.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.1.0', flowUrl: 'https://evil.example/x.json' } });
+  const v4 = r.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.2.0', flowUrl: 'https://evil.example/x.json' } });
   ok(v4[1] && v4[1].payload.indexOf('Update failed: flowUrl refused') === 0, 'flowUrl outside the repo refused');
   // network error
   const v5 = r.run('habridge.brain', { error: { message: 'dns gone' } });
@@ -149,21 +149,21 @@ section('S4 updater: sentence templates, validation, merge, broker rescue, deplo
   // update button -> check -> download
   const r2 = makeRunner();
   r2.run('habridge.brain', { payload: 'update' });
-  r2.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.1.0', flowUrl: RAWFLOW } });
+  r2.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.2.0', flowUrl: RAWFLOW } });
   const dl = r2.run('habridge.brain', { habPhase: 'flow', statusCode: 200, payload: JSON.stringify([
-    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v2.1.0 (test).' },
+    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v2.2.0 (test).' },
     { id: 'habridge.mqtt', type: 'mqtt out', broker: '92e5b2c.00a8b5' }
   ]) });
-  ok(dl[2] && dl[2].payload === 'Downloaded bridge 2.1.0. Deploying...', 'download phase status sentence', dl[2] && dl[2].payload);
+  ok(dl[2] && dl[2].payload === 'Downloaded bridge 2.2.0. Deploying...', 'download phase status sentence', dl[2] && dl[2].payload);
   ok(dl[0] && dl[0].url === 'http://127.0.0.1:1880/flows', 'download ok -> read running flows via loopback Admin API', dl[0] && dl[0].url);
   // 401 -> token request (env credentials)
   const t = r2.run('habridge.brain', { habPhase: 'adminflows', statusCode: 401, payload: {} });
   ok(!t[0] && t[1] && t[1].payload.indexOf('Update failed: Admin login required') === 0, '401 without env credentials fails with a clear sentence', t[1] && t[1].payload);
   r2.envVars['HAB_ADMIN_USER'] = 'u'; r2.envVars['HAB_ADMIN_PASS'] = 'p';
   r2.run('habridge.brain', { payload: 'update' });
-  r2.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.1.0', flowUrl: RAWFLOW } });
+  r2.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.2.0', flowUrl: RAWFLOW } });
   r2.run('habridge.brain', { habPhase: 'flow', statusCode: 200, payload: JSON.stringify([
-    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v2.1.0 (test).' },
+    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v2.2.0 (test).' },
     { id: 'habridge.mqtt', type: 'mqtt out', broker: '92e5b2c.00a8b5' }
   ]) });
   const t2 = r2.run('habridge.brain', { habPhase: 'adminflows', statusCode: 401, payload: {} });
@@ -176,9 +176,9 @@ section('S4 updater: sentence templates, validation, merge, broker rescue, deplo
   // merge (v2 shape): personal nodes survive, old bridge nodes replaced, broker rescue
   const r3 = makeRunner();
   r3.run('habridge.brain', { payload: 'update' });
-  r3.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.1.0', flowUrl: RAWFLOW } });
+  r3.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.2.0', flowUrl: RAWFLOW } });
   r3.run('habridge.brain', { habPhase: 'flow', statusCode: 200, payload: JSON.stringify([
-    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v2.1.0 (test).' },
+    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v2.2.0 (test).' },
     { id: 'habridge.mqtt', type: 'mqtt out', broker: '92e5b2c.00a8b5' }
   ]) });
   const d = r3.run('habridge.brain', { habPhase: 'adminflows', statusCode: 200, payload: { flows: [
@@ -195,13 +195,13 @@ section('S4 updater: sentence templates, validation, merge, broker rescue, deplo
   ok(!body.flows.some(n => n.id === 'habridge.tab.old') && body.flows.some(n => n.id === 'habridge.tab.0001'), 'only habridge.* nodes are replaced');
   ok(body.flows.find(n => n.id === 'habridge.mqtt').broker === 'broker.local', 'broker rescue: pinned broker id missing -> locally most-used broker');
   const dep = r3.run('habridge.brain', { habPhase: 'deploy', statusCode: 200, payload: {} });
-  ok(dep[1] && dep[1].payload === 'Bridge update succeeded: now running 2.1.0. Fields refresh after the restart.' && dep[1].topic === 'HA Bridge', 'deploy success sentence (no arrow shorthand)', dep[1] && dep[1].payload);
-  ok(dep[2] && dep[2].payload === 'Last update: 2.1.0 (ok).', 'last-update line on the Update status field', dep[2] && dep[2].payload);
+  ok(dep[1] && dep[1].payload === 'Bridge update succeeded: now running 2.2.0. Fields refresh after the restart.' && dep[1].topic === 'HA Bridge', 'deploy success sentence (no arrow shorthand)', dep[1] && dep[1].payload);
+  ok(dep[2] && dep[2].payload === 'Last update: 2.2.0 (ok).', 'last-update line on the Update status field', dep[2] && dep[2].payload);
   const dep2 = makeRunner();
   dep2.run('habridge.brain', { payload: 'update' });
-  dep2.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.1.0', flowUrl: RAWFLOW } });
+  dep2.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.2.0', flowUrl: RAWFLOW } });
   dep2.run('habridge.brain', { habPhase: 'flow', statusCode: 200, payload: JSON.stringify([
-    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v2.1.0 (test).' },
+    { id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v2.2.0 (test).' },
     { id: 'habridge.mqtt', type: 'mqtt out', broker: '92e5b2c.00a8b5' }
   ]) });
   dep2.run('habridge.brain', { habPhase: 'adminflows', statusCode: 200, payload: [] });
@@ -211,7 +211,7 @@ section('S4 updater: sentence templates, validation, merge, broker rescue, deplo
   // download validation
   const r4 = makeRunner();
   r4.run('habridge.brain', { payload: 'update' });
-  r4.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.1.0', flowUrl: RAWFLOW } });
+  r4.run('habridge.brain', { habPhase: 'ver', statusCode: 200, payload: { version: '2.2.0', flowUrl: RAWFLOW } });
   const bad1 = r4.run('habridge.brain', { habPhase: 'flow', statusCode: 200, payload: JSON.stringify([{ id: 'foreign.node', type: 'tab' }]) });
   ok(bad1[1] && bad1[1].payload === 'Update failed: non-bridge node id in downloaded file: foreign.node.', 'foreign ids refused');
   const bad2 = r4.run('habridge.brain', { habPhase: 'flow', statusCode: 200, payload: JSON.stringify([{ id: 'habridge.tab.0001', type: 'tab', info: 'HA Bridge v0.0.1 (mismatch).' }]) });
